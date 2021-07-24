@@ -8,11 +8,12 @@ import 'package:telephony/telephony.dart';
 
 Future<void> sendSms(String text, String num) async {
   final Telephony telephony = Get.find();
+  await telephony.requestPhoneAndSmsPermissions;
   await telephony.sendSms(to: num, message: text);
 }
 
 // =================================== Read contacts
-Future<List> readContact() async {
+Future<List<ContactModel>> readContact() async {
   List<ContactModel> contacts = [];
   await Contacts.streamContacts(
           // bufferSize: 20 by default
@@ -32,22 +33,19 @@ Future<List> readContact() async {
 }
 // =================================== Read call log
 
-Future<Iterable> callLog() async {
+Future<Iterable<CallLogEntry>> callLog() async {
   // GET WHOLE CALL LOG
   // Iterable<CallLogEntry> entries = await CallLog.get();
   // QUERY CALL LOG (ALL PARAMS ARE OPTIONAL)
   var now = DateTime.now();
-  int from = now.subtract(Duration(days: 10)).millisecondsSinceEpoch;
+  Iterable<CallLogEntry> entries = await CallLog.get();
+  int from = now.subtract(Duration(days: 5)).millisecondsSinceEpoch;
   int to = now.subtract(Duration(days: 1)).millisecondsSinceEpoch;
-  Iterable<CallLogEntry> entries = await CallLog.query(
-    dateFrom: from,
-    dateTo: to,
-    // durationFrom: 0,
-    // durationTo: 60,
-    // name: 'John Doe',
-    // number: '901700000',
-    // type: CallType.incoming,
-  );
+  // Iterable<CallLogEntry> entries = await CallLog.query(
+  //   dateFrom: from,
+  //   dateTo: to,
+
+  // );
   return entries;
 }
 
@@ -76,5 +74,5 @@ Future<void> permission() async {
         Future.error("$key :  permanentlyDenied");
     },
   );
-  print(statuses[Permission.location]);
+  // print(statuses[Permission.location]);
 }
